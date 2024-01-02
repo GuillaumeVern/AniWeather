@@ -3,11 +3,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.circles"
-    compileSdk = 33
+    namespace = "com.example.aniweather"
+    compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.circles"
+        applicationId = "com.example.aniweather"
         minSdk = 29
         targetSdk = 33
         versionCode = 1

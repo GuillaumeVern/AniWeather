@@ -1,4 +1,4 @@
-package com.example.circles;
+package com.example.aniweather;
 
 import org.junit.Test;
 
