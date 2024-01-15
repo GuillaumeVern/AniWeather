@@ -3,6 +3,10 @@ package com.example.aniweather;
 import android.os.Handler;
 import android.os.Looper;
 
+import com.example.aniweather.model.WeatherAPIData;
+
+import org.json.JSONObject;
+
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.*;
@@ -10,6 +14,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.Iterator;
 
 /**
  * classe singleton servant a gérer la mise en cache des données de l'api
@@ -21,7 +26,9 @@ public class WeatherDataRepository {
 
     private City city;
 
-    private ArrayList allTheData;
+    private String allTheData;
+
+    private WeatherAPIData weatherAPIData;
 
 
     private WeatherDataRepository(){};
@@ -41,7 +48,7 @@ public class WeatherDataRepository {
         this.city = city;
     }
 
-    public ArrayList setAllTheData(){
+    public void setAllTheData(){
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
@@ -68,7 +75,7 @@ public class WeatherDataRepository {
                         response.append(inputLine);
                     }
                     in.close();
-                    System.out.println(response);
+                    this.allTheData = response.toString();
                 } else {
                     System.out.println("all the data GET request did not work.");
                 }
@@ -76,9 +83,26 @@ public class WeatherDataRepository {
                 System.out.println(MessageFormat.format("all the data error: {0} ; {1}", e, e.getMessage()));
             }
             handler.post(() -> {
+                parseToWeatherApiData();
             });
         });
-                return new ArrayList();
+    }
+
+    public void parseToWeatherApiData(){
+        try{
+            JSONObject allTheDataJsonObject = new JSONObject(allTheData);
+            Iterator<String> keys = allTheDataJsonObject.keys();
+
+            while(keys.hasNext()){
+                String key = keys.next();
+                if(allTheDataJsonObject.get(key) instanceof JSONObject){
+                    System.out.println("current jsonObject : " + allTheDataJsonObject.get(key));
+                }
+            }
+
+        } catch(Exception e){
+            System.out.println("erreur lors du parsing de AllTheData : " + e.getMessage());
+        }
     }
 
 

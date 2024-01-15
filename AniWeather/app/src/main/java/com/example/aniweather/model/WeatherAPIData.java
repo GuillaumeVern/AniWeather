@@ -1,5 +1,8 @@
 package com.example.aniweather.model;
 
+import com.example.aniweather.enums.Timezone;
+
+import java.util.ArrayList;
 import java.util.Date;
 
 
@@ -11,11 +14,9 @@ public class WeatherAPIData {
     private int utc_offset_seconds;
     private Timezone timezone;
     private double elevation;
-    private Units current_units;
+    private Units units;
     private Current current;
-    private TimedUnits hourly_units;
     private ArrayList<Hourly> hourly;
-    private TimedUnits daily_units;
     private ArrayList<Daily> daily;
 
     public double getLatitude() {
@@ -66,12 +67,12 @@ public class WeatherAPIData {
         this.elevation = elevation;
     }
 
-    public Units getCurrent_units() {
-        return current_units;
+    public Units getUnits() {
+        return units;
     }
 
-    public void setCurrent_units(Units current_units) {
-        this.current_units = current_units;
+    public void setUnits(Units current_units) {
+        this.units = current_units;
     }
 
     public Current getCurrent() {
@@ -82,13 +83,6 @@ public class WeatherAPIData {
         this.current = current;
     }
 
-    public TimedUnits getHourly_units() {
-        return hourly_units;
-    }
-
-    public void setHourly_units(TimedUnits hourly_units) {
-        this.hourly_units = hourly_units;
-    }
 
     public ArrayList<Hourly> getHourly() {
         return hourly;
@@ -96,14 +90,6 @@ public class WeatherAPIData {
 
     public void setHourly(ArrayList<Hourly> hourly) {
         this.hourly = hourly;
-    }
-
-    public TimedUnits getDaily_units() {
-        return daily_units;
-    }
-
-    public void setDaily_units(TimedUnits daily_units) {
-        this.daily_units = daily_units;
     }
 
     public ArrayList<Daily> getDaily() {
