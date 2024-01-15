@@ -32,10 +32,10 @@ public class MainActivity extends AppCompatActivity{
         this.main_city_display = (TextView) findViewById(R.id.main_city_display);
         this.main_city_name = main_city_display.getText().toString();
         this.cities_button = (Button) findViewById(R.id.cities_button);
+        weatherDataRepository = WeatherDataRepository.getInstance();
+
         citiesButtonHandler();
 
-        weatherDataRepository = WeatherDataRepository.getInstance();
-        getWeatherInfoFromSelectedCity();
 
     }
 
@@ -53,19 +53,13 @@ public class MainActivity extends AppCompatActivity{
 
         this.cities_button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-
+                City city = new City(main_city_name);
+                weatherDataRepository.setCity(city);
+                weatherDataRepository.setAllTheData();
             }
         });
     }
 
-    public void getWeatherInfoFromSelectedCity(){
-        city = new City(this, main_city_name);
-    }
-
-    public void setMain_temperature_number(String temperatureNumber){
-        System.out.println("latitude: " + city.getLatitude());
-        weatherDataRepository.setCity(city);
-    }
 
 
 }
