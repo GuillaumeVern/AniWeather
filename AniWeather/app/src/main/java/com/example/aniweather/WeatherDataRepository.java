@@ -3,7 +3,11 @@ package com.example.aniweather;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.example.aniweather.model.WeatherAPIData;
+import com.example.aniweather.enums.Timezone;
+import com.example.aniweather.model.Current;
+import com.example.aniweather.model.Daily;
+import com.example.aniweather.model.Hourly;
+import com.example.aniweather.model.Units;
 
 import org.json.JSONObject;
 
@@ -28,7 +32,16 @@ public class WeatherDataRepository {
 
     private String allTheData;
 
-    private WeatherAPIData weatherAPIData;
+    private double latitude;
+    private double longitude;
+    private double generationtime_ms;
+    private int utc_offset_seconds;
+    private Timezone timezone;
+    private double elevation;
+    private Units units;
+    private Current current;
+    private ArrayList<Hourly> hourly;
+    private ArrayList<Daily> daily;
 
 
     private WeatherDataRepository(){};
@@ -88,6 +101,11 @@ public class WeatherDataRepository {
         });
     }
 
+    public String getAllTheData() {
+        return allTheData;
+    }
+
+
     public void parseToWeatherApiData(){
         try{
             JSONObject allTheDataJsonObject = new JSONObject(allTheData);
@@ -95,8 +113,43 @@ public class WeatherDataRepository {
 
             while(keys.hasNext()){
                 String key = keys.next();
+                System.out.println(key + " : " + allTheDataJsonObject.getString(key));
                 if(allTheDataJsonObject.get(key) instanceof JSONObject){
-                    System.out.println("current jsonObject : " + allTheDataJsonObject.get(key));
+                    switch(key){
+                        case "latitude":
+                            this.setLatitude(allTheDataJsonObject.getDouble(key));
+                            break;
+                        case "longitude":
+                            this.setLongitude(allTheDataJsonObject.getDouble(key));
+                            break;
+                        case "utc_offset_seconds":
+                            this.setUtc_offset_seconds(allTheDataJsonObject.getInt(key));
+                            break;
+                        case "timezone":
+                            this.setTimezone(allTheDataJsonObject.getString(key));
+                            break;
+                        case "timezone_abbreviation":
+                            // l'abbreviation est directement définie dans l'enum
+                            break;
+                        case "elevation":
+                            this.setElevation(allTheDataJsonObject.getDouble(key));
+                            break;
+                        case "current_units":
+                            break;
+                        case "current":
+                            this.setCurrent(allTheDataJsonObject.getJSONObject(key));
+                            break;
+                        case "hourly_units":
+                            break;
+                        case "hourly":
+                            break;
+                        case "daily_units":
+                            break;
+                        case "daily":
+                            break;
+                        default:
+                            break;
+                    }
                 }
             }
 
@@ -105,6 +158,91 @@ public class WeatherDataRepository {
         }
     }
 
+
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getGenerationtime_ms() {
+        return generationtime_ms;
+    }
+
+    public void setGenerationtime_ms(double generationtime_ms) {
+        this.generationtime_ms = generationtime_ms;
+    }
+
+    public int getUtc_offset_seconds() {
+        return utc_offset_seconds;
+    }
+
+    public void setUtc_offset_seconds(int utc_offset_seconds) {
+        this.utc_offset_seconds = utc_offset_seconds;
+    }
+
+    public Timezone getTimezone() {
+        return timezone;
+    }
+
+    public void setTimezone(String timezone) {
+        this.timezone = Timezone.getTimezoneFromString(timezone);
+    }
+    public void setTimezone(Timezone timezone) {
+        this.timezone = timezone;
+    }
+
+    public double getElevation() {
+        return elevation;
+    }
+
+    public void setElevation(double elevation) {
+        this.elevation = elevation;
+    }
+
+    public Units getUnits() {
+        return units;
+    }
+
+    public void setUnits(Units current_units) {
+        this.units = current_units;
+    }
+
+    public Current getCurrent() {
+        return current;
+    }
+
+    public void setCurrent(JSONObject current_data) {
+            this.current = new Current(current_data);
+    }
+
+
+    public ArrayList<Hourly> getHourly() {
+        return hourly;
+    }
+
+    public void setHourly(ArrayList<Hourly> hourly) {
+        this.hourly = hourly;
+    }
+
+    public ArrayList<Daily> getDaily() {
+        return daily;
+    }
+
+    public void setDaily(ArrayList<Daily> daily) {
+        this.daily = daily;
+    }
 
 
 

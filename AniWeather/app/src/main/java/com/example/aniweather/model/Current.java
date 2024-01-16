@@ -1,5 +1,9 @@
 package com.example.aniweather.model;
 
+import org.json.JSONObject;
+
+import java.util.Iterator;
+
 public class Current {
 
     private String time;
@@ -19,6 +23,75 @@ public class Current {
     private double wind_speed_10m;
     private int wind_direction_10m;
     private double wind_gusts_10m;
+
+    public Current(JSONObject current_data){
+        Iterator<String> keys = current_data.keys();
+
+        try{
+            while(keys.hasNext()){
+                String key = keys.next();
+                if(current_data.get(key) instanceof Object){
+                    switch(key){
+                        case "time":
+                            this.setTime(current_data.getString(key));
+                            break;
+                        case "interval":
+                            this.setInterval(current_data.getInt(key));
+                            break;
+                        case "temperature_2m":
+                            this.setTemperature_2m(current_data.getDouble(key));
+                            break;
+                        case "relative_humidity_2m":
+                            this.setRelative_humidity_2m(current_data.getInt(key));
+                            break;
+                        case "apparent_temperature":
+                            this.setApparent_temperature(current_data.getDouble(key));
+                            break;
+                        case "is_day":
+                            this.setIs_day((current_data.getInt(key)));
+                            break;
+                        case "precipitation":
+                            this.setPrecipitation(current_data.getDouble(key));
+                            break;
+                        case "rain":
+                            this.setRain(current_data.getDouble(key));
+                            break;
+                        case "showers":
+                            this.setShowers(current_data.getDouble(key));
+                            break;
+                        case "snowfall":
+                            this.setSnowfall(current_data.getDouble(key));
+                            break;
+                        case "weather_code":
+                            this.setWeather_code(current_data.getInt(key));
+                            break;
+                        case "cloud_cover":
+                            this.setCloud_cover(current_data.getInt(key));
+                            break;
+                        case "pressure_msl":
+                            this.setPressure_msl(current_data.getDouble(key));
+                            break;
+                        case "surface_pressure":
+                            this.setSurface_pressure(current_data.getDouble(key));
+                            break;
+                        case "wind_speed_10m":
+                            this.setWind_speed_10m(current_data.getDouble(key));
+                            break;
+                        case "wind_direction_10m":
+                            this.setWind_direction_10m(current_data.getInt(key));
+                            break;
+                        case "wind_gusts_10m":
+                            this.setWind_gusts_10m(current_data.getDouble(key));
+                            break;
+                        default:
+                            break;
+                    }
+                }
+            }
+        } catch(Exception e){
+            System.out.println("erreur lors du parsing de current : " + e.getMessage());
+        }
+    }
 
     public String getTime() {
         return time;
