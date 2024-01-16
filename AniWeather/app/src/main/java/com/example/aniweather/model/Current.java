@@ -1,5 +1,7 @@
 package com.example.aniweather.model;
 
+import com.example.aniweather.enums.WeatherVariable;
+
 import org.json.JSONObject;
 
 import java.util.Iterator;
@@ -16,13 +18,15 @@ public class Current {
     private double rain;
     private double showers;
     private double snowfall;
-    private double weather_code;
+    private WeatherVariable weatherVariable;
     private int cloud_cover;
     private double pressure_msl;
     private double surface_pressure;
     private double wind_speed_10m;
     private int wind_direction_10m;
     private double wind_gusts_10m;
+
+
 
     public Current(JSONObject current_data){
         Iterator<String> keys = current_data.keys();
@@ -63,7 +67,7 @@ public class Current {
                             this.setSnowfall(current_data.getDouble(key));
                             break;
                         case "weather_code":
-                            this.setWeather_code(current_data.getInt(key));
+                            this.setWeatherVariable(current_data.getInt(key));
                             break;
                         case "cloud_cover":
                             this.setCloud_cover(current_data.getInt(key));
@@ -179,12 +183,12 @@ public class Current {
         this.snowfall = snowfall;
     }
 
-    public double getWeather_code() {
-        return weather_code;
+    public WeatherVariable getWeatherVariable() {
+        return weatherVariable;
     }
 
-    public void setWeather_code(double weather_code) {
-        this.weather_code = weather_code;
+    public void setWeatherVariable(int weatherVariable) {
+        this.weatherVariable = WeatherVariable.getWeatherVariableFromCode(weatherVariable);
     }
 
     public int getCloud_cover() {

@@ -1,8 +1,14 @@
 package com.example.aniweather.model;
+import com.example.aniweather.enums.WeatherVariable;
+
+import org.json.JSONObject;
+
 import java.time.*;
+import java.util.Iterator;
+
 public class Daily{
     private LocalDate time;
-    private int weather_code;
+    private WeatherVariable weatherVariable;
     private double temperature_2m_max;
     private double temperature_2m_min;
     private LocalDateTime sunrise;
@@ -17,6 +23,69 @@ public class Daily{
     private double wind_gusts_10m_dominant;
     private double shortwave_radiation_sum;
 
+    public Daily(JSONObject daily_data, int i){
+        Iterator<String> keys = daily_data.keys();
+
+        try{
+
+            while(keys.hasNext()) {
+                String key = keys.next();
+                if (daily_data.get(key) instanceof Object) {
+                    switch (key) {
+                        case "time":
+                            this.setTime(LocalDate.parse(daily_data.getJSONArray(key).getString(i)));
+                            break;
+                        case "weather_code":
+                            this.setWeatherVariable(daily_data.getJSONArray(key).getInt(i));
+                            break;
+                        case "temperature_2m_max":
+                            this.setTemperature_2m_max(daily_data.getJSONArray(key).getDouble(i));
+                            break;
+                        case "temperature_2m_min":
+                            this.setTemperature_2m_min(daily_data.getJSONArray(key).getDouble(i));
+                            break;
+                        case "sunrise":
+                            this.setSunrise(LocalDateTime.parse(daily_data.getJSONArray(key).getString(i)));
+                            break;
+                        case "sunset":
+                            this.setSunset(LocalDateTime.parse(daily_data.getJSONArray(key).getString(i)));
+                            break;
+                        case "daylight_duration":
+                            this.setDaylight_duration(daily_data.getJSONArray(key).getDouble(i));
+                            break;
+                        case "sunshine_duration":
+                            this.setSunshine_duration(daily_data.getJSONArray(key).getDouble(i));
+                            break;
+                        case "uv_index_max":
+                            this.setUv_index_max(daily_data.getJSONArray(key).getDouble(i));
+                            break;
+                        case "precipitation_sum":
+                            this.setPrecipitation_sum(daily_data.getJSONArray(key).getInt(i));
+                            break;
+                        case "precipitation_hours":
+                            this.setPrecipitation_hours(daily_data.getJSONArray(key).getDouble(i));
+                            break;
+                        case "precipitation_probability_max":
+                            this.setPrecipitation_probability_max(daily_data.getJSONArray(key).getInt(i));
+                            break;
+                        case "wind_speed_10m_max":
+                            this.setWind_speed_10m_max(daily_data.getJSONArray(key).getDouble(i));
+                            break;
+                        case "wind_gusts_10m_dominant":
+                            this.setWind_gusts_10m_dominant(daily_data.getJSONArray(key).getDouble(i));
+                            break;
+                        case "shortwave_radiation_sum":
+                            this.setShortwave_radiation_sum(daily_data.getJSONArray(key).getDouble(i));
+                            break;
+                    }
+                }
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public LocalDate getTime() {
         return time;
     }
@@ -25,12 +94,12 @@ public class Daily{
         this.time = time;
     }
 
-    public int getWeather_code() {
-        return weather_code;
+    public WeatherVariable getWeatherVariable() {
+        return weatherVariable;
     }
 
-    public void setWeather_code(int weather_code) {
-        this.weather_code = weather_code;
+    public void setWeatherVariable(int weatherVariable) {
+        this.weatherVariable = WeatherVariable.getWeatherVariableFromCode(weatherVariable);
     }
 
     public double getTemperature_2m_max() {

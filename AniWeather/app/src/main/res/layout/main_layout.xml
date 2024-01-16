@@ -20,16 +20,16 @@
         <Button
             android:id="@+id/cities_button"
             style="@style/Widget.AppCompat.Button"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="+" />
+            android:layout_weight="4"
+            android:text="Select city" />
 
         <EditText
             android:id="@+id/main_city_display"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
+            android:layout_weight="6"
             android:ems="10"
             android:inputType="text"
             android:text="Montauban"
@@ -37,10 +37,10 @@
 
         <Button
             android:id="@+id/settings_button"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Button" />
+            android:layout_weight="4"
+            android:text="Settings" />
     </LinearLayout>
 
     <ScrollView
@@ -79,7 +79,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:includeFontPadding="false"
-                android:text="10"
                 android:textAlignment="center"
                 android:textSize="60sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -92,7 +91,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
-                android:text="Cloudy"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toStartOf="@+id/linearLayout5"
                 app:layout_constraintHorizontal_bias="0.5"
@@ -116,7 +114,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="10°"
                     android:textSize="20sp" />
 
                 <TextView
@@ -132,7 +129,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="4°"
                     android:textSize="20sp" />
             </LinearLayout>
 
@@ -154,12 +150,13 @@
                     <ImageView
                         android:id="@+id/icon_5_days"
                         android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/label_5_days"
+                        android:layout_height="24dp"
+                        app:layout_constraintBottom_toTopOf="@+id/day_1_logo"
                         app:layout_constraintEnd_toStartOf="@+id/label_5_days"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/label_5_days"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintVertical_bias="0.5"
                         app:srcCompat="@mipmap/cloud" />
 
                     <TextView
@@ -174,44 +171,46 @@
                     <ImageView
                         android:id="@+id/day_1_logo"
                         android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/day_1_name"
+                        android:layout_height="24dp"
+                        app:layout_constraintBottom_toTopOf="@+id/day_2_logo"
                         app:layout_constraintEnd_toStartOf="@+id/day_1_name"
+                        app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/day_1_name"
+                        app:layout_constraintTop_toBottomOf="@+id/icon_5_days"
+                        app:layout_constraintVertical_bias="0.5"
                         app:srcCompat="@mipmap/cloud" />
 
                     <TextView
                         android:id="@+id/day_1_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
                         android:text="Today"
-                        app:layout_constraintEnd_toStartOf="@+id/space"
-                        app:layout_constraintHorizontal_chainStyle="packed"
+                        app:layout_constraintBottom_toBottomOf="@+id/day_1_logo"
+                        app:layout_constraintEnd_toStartOf="@+id/day_1_single_word_weather"
+                        app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toEndOf="@+id/day_1_logo"
-                        app:layout_constraintTop_toBottomOf="@+id/label_5_days" />
+                        app:layout_constraintTop_toTopOf="@+id/day_1_logo" />
 
-                    <Space
-                        android:id="@+id/space"
+                    <TextView
+                        android:id="@+id/day_1_single_word_weather"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="5dp"
                         app:layout_constraintBottom_toBottomOf="@+id/day_1_name"
                         app:layout_constraintEnd_toStartOf="@+id/day_1_max"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintHorizontal_chainStyle="packed"
-                        app:layout_constraintStart_toEndOf="@+id/day_1_name" />
+                        app:layout_constraintStart_toEndOf="@+id/day_1_name"
+                        app:layout_constraintTop_toTopOf="@+id/day_1_name" />
 
                     <TextView
                         android:id="@+id/day_1_max"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="10°"
-                        app:layout_constraintBottom_toBottomOf="@+id/space"
+                        app:layout_constraintBottom_toBottomOf="@+id/day_1_single_word_weather"
                         app:layout_constraintEnd_toStartOf="@+id/day_1_separator"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintHorizontal_chainStyle="packed"
-                        app:layout_constraintStart_toEndOf="@+id/space" />
+                        app:layout_constraintStart_toEndOf="@+id/day_1_single_word_weather"
+                        app:layout_constraintTop_toTopOf="@+id/day_1_single_word_weather" />
 
                     <TextView
                         android:id="@+id/day_1_separator"
@@ -222,30 +221,30 @@
                         app:layout_constraintBottom_toBottomOf="@+id/day_1_max"
                         app:layout_constraintEnd_toStartOf="@+id/day_1_min"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintHorizontal_chainStyle="packed"
-                        app:layout_constraintStart_toEndOf="@+id/day_1_max" />
+                        app:layout_constraintStart_toEndOf="@+id/day_1_max"
+                        app:layout_constraintTop_toTopOf="@+id/day_1_max" />
 
                     <TextView
                         android:id="@+id/day_1_min"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="4°"
                         app:layout_constraintBottom_toBottomOf="@+id/day_1_separator"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintHorizontal_chainStyle="packed"
-                        app:layout_constraintStart_toEndOf="@+id/day_1_separator" />
+                        app:layout_constraintStart_toEndOf="@+id/day_1_separator"
+                        app:layout_constraintTop_toTopOf="@+id/day_1_separator" />
 
                     <ImageView
                         android:id="@+id/day_2_logo"
                         android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/day_2_name"
+                        android:layout_height="24dp"
+                        app:layout_constraintBottom_toTopOf="@+id/day_3_logo"
                         app:layout_constraintEnd_toStartOf="@+id/day_2_name"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/day_2_name"
+                        app:layout_constraintTop_toBottomOf="@+id/day_1_logo"
+                        app:layout_constraintVertical_bias="0.5"
                         app:srcCompat="@mipmap/cloud" />
 
                     <TextView
@@ -255,31 +254,33 @@
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
                         android:text="Tomorrow"
-                        app:layout_constraintBottom_toTopOf="@+id/day_3_name"
-                        app:layout_constraintEnd_toStartOf="@+id/space2"
+                        app:layout_constraintBottom_toBottomOf="@+id/day_2_logo"
+                        app:layout_constraintEnd_toStartOf="@+id/day_2_single_word_weather"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toEndOf="@+id/day_2_logo"
-                        app:layout_constraintTop_toBottomOf="@+id/day_1_name" />
+                        app:layout_constraintTop_toTopOf="@+id/day_2_logo" />
 
-                    <Space
-                        android:id="@+id/space2"
+                    <TextView
+                        android:id="@+id/day_2_single_word_weather"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="5dp"
                         app:layout_constraintBottom_toBottomOf="@+id/day_2_name"
                         app:layout_constraintEnd_toStartOf="@+id/day_2_max"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/day_2_name" />
+                        app:layout_constraintStart_toEndOf="@+id/day_2_name"
+                        app:layout_constraintTop_toTopOf="@+id/day_2_name" />
 
                     <TextView
                         android:id="@+id/day_2_max"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="11°"
-                        app:layout_constraintBottom_toBottomOf="@+id/space2"
+                        app:layout_constraintBottom_toBottomOf="@+id/day_2_single_word_weather"
                         app:layout_constraintEnd_toStartOf="@+id/day_2_separator"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/space2" />
+                        app:layout_constraintStart_toEndOf="@+id/day_2_single_word_weather"
+                        app:layout_constraintTop_toTopOf="@+id/day_2_single_word_weather" />
 
                     <TextView
                         android:id="@+id/day_2_separator"
@@ -290,29 +291,31 @@
                         app:layout_constraintBottom_toBottomOf="@+id/day_2_max"
                         app:layout_constraintEnd_toStartOf="@+id/day_2_min"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/day_2_max" />
+                        app:layout_constraintStart_toEndOf="@+id/day_2_max"
+                        app:layout_constraintTop_toTopOf="@+id/day_2_max" />
 
                     <TextView
                         android:id="@+id/day_2_min"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="5°"
                         app:layout_constraintBottom_toBottomOf="@+id/day_2_separator"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintHorizontal_chainStyle="packed"
-                        app:layout_constraintStart_toEndOf="@+id/day_2_separator" />
+                        app:layout_constraintStart_toEndOf="@+id/day_2_separator"
+                        app:layout_constraintTop_toTopOf="@+id/day_2_separator" />
 
                     <ImageView
                         android:id="@+id/day_3_logo"
                         android:layout_width="wrap_content"
-                        android:layout_height="0dp"
-                        app:layout_constraintBottom_toBottomOf="@+id/day_3_name"
+                        android:layout_height="24dp"
+                        app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/day_3_name"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="@+id/day_3_name"
+                        app:layout_constraintTop_toBottomOf="@+id/day_2_logo"
+                        app:layout_constraintVertical_bias="0.5"
                         app:srcCompat="@mipmap/cloud" />
 
                     <TextView
@@ -320,31 +323,33 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Other"
-                        app:layout_constraintBottom_toBottomOf="parent"
-                        app:layout_constraintEnd_toStartOf="@+id/space3"
+                        app:layout_constraintBottom_toBottomOf="@+id/day_3_logo"
+                        app:layout_constraintEnd_toStartOf="@+id/day_3_single_word_weather"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintStart_toEndOf="@+id/day_3_logo"
-                        app:layout_constraintTop_toBottomOf="@+id/day_2_name" />
+                        app:layout_constraintTop_toTopOf="@+id/day_3_logo" />
 
-                    <Space
-                        android:id="@+id/space3"
+                    <TextView
+                        android:id="@+id/day_3_single_word_weather"
                         android:layout_width="0dp"
-                        android:layout_height="0dp"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="5dp"
                         app:layout_constraintBottom_toBottomOf="@+id/day_3_name"
                         app:layout_constraintEnd_toStartOf="@+id/day_3_max"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/day_3_name" />
+                        app:layout_constraintStart_toEndOf="@+id/day_3_name"
+                        app:layout_constraintTop_toTopOf="@+id/day_3_name" />
 
                     <TextView
                         android:id="@+id/day_3_max"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="12°"
-                        app:layout_constraintBottom_toBottomOf="@+id/space3"
+                        app:layout_constraintBottom_toBottomOf="@+id/day_3_single_word_weather"
                         app:layout_constraintEnd_toStartOf="@+id/day_3_separator"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/space3" />
+                        app:layout_constraintStart_toEndOf="@+id/day_3_single_word_weather"
+                        app:layout_constraintTop_toTopOf="@+id/day_3_single_word_weather" />
 
                     <TextView
                         android:id="@+id/day_3_separator"
@@ -355,19 +360,20 @@
                         app:layout_constraintBottom_toBottomOf="@+id/day_3_max"
                         app:layout_constraintEnd_toStartOf="@+id/day_3_min"
                         app:layout_constraintHorizontal_bias="0.5"
-                        app:layout_constraintStart_toEndOf="@+id/day_3_max" />
+                        app:layout_constraintStart_toEndOf="@+id/day_3_max"
+                        app:layout_constraintTop_toTopOf="@+id/day_3_max" />
 
                     <TextView
                         android:id="@+id/day_3_min"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="6°"
                         app:layout_constraintBottom_toBottomOf="@+id/day_3_separator"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="0.5"
                         app:layout_constraintHorizontal_chainStyle="packed"
-                        app:layout_constraintStart_toEndOf="@+id/day_3_separator" />
+                        app:layout_constraintStart_toEndOf="@+id/day_3_separator"
+                        app:layout_constraintTop_toTopOf="@+id/day_3_separator" />
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -42,6 +42,7 @@ public class WeatherDataRepository {
     private Current current;
     private ArrayList<Hourly> hourly;
     private ArrayList<Daily> daily;
+    private boolean dataReceived = false;
 
 
     private WeatherDataRepository(){};
@@ -95,8 +96,10 @@ public class WeatherDataRepository {
             } catch(Exception e){
                 System.out.println(MessageFormat.format("all the data error: {0} ; {1}", e, e.getMessage()));
             }
+
+            parseToWeatherApiData();
+
             handler.post(() -> {
-                parseToWeatherApiData();
             });
         });
     }
@@ -142,16 +145,19 @@ public class WeatherDataRepository {
                         case "hourly_units":
                             break;
                         case "hourly":
+                            this.setHourly(allTheDataJsonObject.getJSONObject(key));
                             break;
                         case "daily_units":
                             break;
                         case "daily":
+                            this.setDaily(allTheDataJsonObject.getJSONObject(key));
                             break;
                         default:
                             break;
                     }
                 }
             }
+            this.setDataReceived(true);
 
         } catch(Exception e){
             System.out.println("erreur lors du parsing de AllTheData : " + e.getMessage());
@@ -232,16 +238,45 @@ public class WeatherDataRepository {
         return hourly;
     }
 
-    public void setHourly(ArrayList<Hourly> hourly) {
-        this.hourly = hourly;
+    public void setHourly(JSONObject hourlyJSONObject) {
+        this.hourly = new ArrayList<Hourly>();
+        try{
+            for(int i = 0; i < hourlyJSONObject.getJSONArray("time").length(); i++) {
+                Hourly hourly = new Hourly(hourlyJSONObject, i);
+                this.hourly.add(hourly);
+            }
+
+        } catch(Exception e){
+            System.out.println("erreur lors du parsing de Hourly : " + e.getMessage());
+        }
     }
 
     public ArrayList<Daily> getDaily() {
         return daily;
     }
 
-    public void setDaily(ArrayList<Daily> daily) {
-        this.daily = daily;
+    public void setDaily(JSONObject dailyJSONObject) {
+        this.daily = new ArrayList<Daily>();
+        try{
+            for(int i = 0; i < dailyJSONObject.getJSONArray("time").length(); i++) {
+                Daily daily = new Daily(dailyJSONObject, i);
+                this.daily.add(daily);
+            }
+        } catch(Exception e){
+            System.out.println("erreur lors du parsing de Daily : " + e.getMessage());
+        }
+    }
+
+    public boolean isDataReceived() {
+        return dataReceived;
+    }
+
+    public void setDataReceived(boolean dataReceived) {
+        this.dataReceived = dataReceived;
+    }
+
+    public Daily getToday(){
+        return this.daily.get(0);
     }
 
 
