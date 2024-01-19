@@ -13,6 +13,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
@@ -30,10 +31,12 @@ public class City {
         this.responseReceived = false;
         executor.execute(() -> {
             try{
-                URL url = new URL(MessageFormat.format("https://geo.api.gouv.fr/communes?nom={0}&boost=population&limit=1&fields=centre", cityName));
+                URL url = new URL(MessageFormat.format("https://geokeo.com/geocode/v1/search.php?q={0}&api=64850d598ad9483c8b78f2aa166556a7", URLEncoder.encode(cityName)));
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
                 con.setRequestMethod("GET");
                 con.setConnectTimeout(5000);
+
+                System.out.println("connection:" + con.getHeaderFields());
                 System.out.println(con.getURL());
                 int responseCode = con.getResponseCode();
                 System.out.println("city name GET Response Code :: " + responseCode);
@@ -67,15 +70,18 @@ public class City {
 
     private void parseResponseToObject(String response){
         try{
-            JSONArray jsonArray = new JSONArray(response);
-            JSONArray coordinates = jsonArray.getJSONObject(0).getJSONObject("centre").getJSONArray("coordinates");
-
-            this.longitude = coordinates.getString(0);
-            this.latitude = coordinates.getString(1);
-        } catch(Exception e){
-            System.out.println("erreur lors du parsing des coordonnées : " + e.getMessage());
+            JSONObject responseJson = new JSONObject(response);
+            JSONArray results = responseJson.getJSONArray("results");
+            JSONObject result = results.getJSONObject(0);
+            JSONObject address_components = result.getJSONObject("address_components");
+            JSONObject geometry = result.getJSONObject("geometry");
+            JSONObject location = geometry.getJSONObject("location");
+            this.name = address_components.getString("name");
+            this.latitude = location.getString("lat");
+            this.longitude = location.getString("lng");
+        } catch(JSONException e){
+            System.out.println(MessageFormat.format("error: {0} ; {1}", e, e.getMessage()));
         }
-
     }
 
     public String getLatitude() {

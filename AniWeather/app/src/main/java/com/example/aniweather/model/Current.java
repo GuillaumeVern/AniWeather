@@ -4,11 +4,12 @@ import com.example.aniweather.enums.WeatherVariable;
 
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
 import java.util.Iterator;
 
 public class Current {
 
-    private String time;
+    private LocalDateTime time;
     private int interval;
     private double temperature_2m;
     private int relative_humidity_2m;
@@ -97,12 +98,13 @@ public class Current {
         }
     }
 
-    public String getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
     public void setTime(String time) {
-        this.time = time;
+        LocalDateTime localDateTime = LocalDateTime.parse(time);
+        this.time = localDateTime;
     }
 
     public int getInterval() {
