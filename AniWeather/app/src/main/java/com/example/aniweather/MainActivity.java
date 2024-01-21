@@ -2,6 +2,7 @@ package com.example.aniweather;
 
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.room.Room;
 import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
@@ -89,6 +91,7 @@ public class MainActivity extends AppCompatActivity{
     private ScrollView scrollView;
     private ImageView background_image;
     private ConstraintLayout secondary_constraint_layout;
+    private RecyclerView recycler_view;
 
     private City city;
 
@@ -166,15 +169,19 @@ public class MainActivity extends AppCompatActivity{
         viewPager.setCurrentItem(1);
 
         this.metric_units = getSharedPreferences("prefs", MODE_PRIVATE).getString("metric_units", "metric").equals("metric");
+
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
-        SharedPreferences.Editor editor = prefs.edit();
-        editor.putString("city", main_city_display.getText().toString());
-        editor.apply();
+        if(main_city_display != null && main_city_display.getText() != null){
+            SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putString("city", main_city_display.getText().toString());
+            editor.apply();
+        }
+
     }
 
     @Override
@@ -225,6 +232,7 @@ public class MainActivity extends AppCompatActivity{
         this.icon_24_hours = (ImageView) findViewById(R.id.icon_24_hours);
         this.scrollView = (ScrollView) findViewById(R.id.scrollView);
         this.background_image = (ImageView) findViewById(R.id.background_image);
+        this.recycler_view = (RecyclerView) findViewById(R.id.recycler_view);
 
     }
 
@@ -252,6 +260,7 @@ public class MainActivity extends AppCompatActivity{
     public void initCurrentData(){
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
+
 
         executor.execute(() -> {
             City city;
@@ -301,6 +310,13 @@ public class MainActivity extends AppCompatActivity{
                 String min_day_temp = String.valueOf(today.getTemperature_2m_min());
                 main_min_day_temp.setText(min_day_temp + "°");
 
+                if(getSharedPreferences("prefs", MODE_PRIVATE).getBoolean("i_like_doughnuts", false)){
+                    background_image.setImageResource(R.drawable.doughnut);
+                    secondary_constraint_layout.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.doughnut, null));
+                } else {
+                    background_image.setImageResource(getResources().getIdentifier(this.weatherDataRepository.getCurrent().getWeatherVariable().path, "drawable", getPackageName()));
+                }
+
                 initWeekForecastData();
                 buildChart();
                 initAdditionalInfo();
@@ -315,12 +331,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void initWeekForecastData(){
-        if(getSharedPreferences("prefs", MODE_PRIVATE).getBoolean("i_like_doughnuts", false)){
-            background_image.setImageResource(R.drawable.doughnut);
-            secondary_constraint_layout.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.doughnut, null));
-        } else {
-            background_image.setImageResource(getResources().getIdentifier(this.weatherDataRepository.getDaily().get(0).getWeatherVariable().path, "drawable", getPackageName()));
-        }
+
 
 
         String icon_5_days_path = this.weatherDataRepository.getDaily().get(0).getWeatherVariable().path;
@@ -369,7 +380,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void buildChart(){
-        String icon_24_hours_path = this.weatherDataRepository.getHourly().get(0).getWeatherVariable().path;
+        String icon_24_hours_path = this.weatherDataRepository.getDaily().get(0).getWeatherVariable().path;
         icon_24_hours.setImageResource(getResources().getIdentifier(icon_24_hours_path, "drawable", getPackageName()));
 
 
@@ -480,6 +491,20 @@ public class MainActivity extends AppCompatActivity{
         sunset_time.setText(sunset);
     }
 
+    public void setMain_city_name(String main_city_name) {
+        this.main_city_name = main_city_name;
+        if(main_city_display != null){
+            main_city_display.setText(main_city_name);
+        }
+        viewPager.setCurrentItem(1);
+        initCurrentData();
+    }
+
+    public void refresh(){
+        Intent i = new Intent(AniWeatherApplication.getAppContext(), MainActivity.class);
+        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(i);
+    }
 
 
     @Override

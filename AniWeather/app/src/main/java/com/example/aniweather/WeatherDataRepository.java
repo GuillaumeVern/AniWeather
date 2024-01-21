@@ -38,9 +38,7 @@ public class WeatherDataRepository {
 
 
     private City city;
-
     private JSONObject allTheData;
-
     private double latitude;
     private double longitude;
     private double generationtime_ms;
@@ -99,6 +97,7 @@ public class WeatherDataRepository {
                             JSONObject allTheData = new JSONObject(response.toString());
                             allTheData.put("city_latitude", city.getLatitude());
                             allTheData.put("city_longitude", city.getLongitude());
+                            allTheData.put("city_name", city.getName());
                             this.allTheData = allTheData;
                             writeToSavedCities();
                             parseToWeatherApiData();
@@ -179,6 +178,7 @@ public class WeatherDataRepository {
             System.out.println("erreur lors de l'écriture dans savedCities : " + e.getMessage());
         }
     }
+
 
     public void parseToWeatherApiData(){
         try{

@@ -62,9 +62,7 @@ public class SettingsFragment extends Fragment {
 
         // utilisation d'une intent parce que c'est plus simple et parce que j'en ai pas utilisé dans toute l'appli
         this.apply_settings.setOnClickListener(v -> {
-            Intent i = new Intent(AniWeatherApplication.getAppContext(), MainActivity.class);
-            i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_NEW_TASK);
-            startActivity(i);
+            ((MainActivity) requireActivity()).refresh();
         });
         return rootView;
     }
