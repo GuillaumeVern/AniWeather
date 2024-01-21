@@ -7,13 +7,10 @@ import android.view.ViewGroup;
 
 import androidx.fragment.app.Fragment;
 
-import com.example.aniweather.R;
-
-public class EmptyFragment extends Fragment {
-
+public class SavedCitiesFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_screen_slide_page, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(com.example.aniweather.R.layout.saved_cities_layout, container, false);
         return rootView;
     }
 }

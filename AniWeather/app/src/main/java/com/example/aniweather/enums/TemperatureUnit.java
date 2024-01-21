@@ -2,7 +2,7 @@ package com.example.aniweather.enums;
 
 public enum TemperatureUnit {
     CELSIUS("°C"),
-    FAHRENHEIT("°K"),
+    FAHRENHEIT("°F"),
     KELVIN("°K");
 
     public final String libelle;

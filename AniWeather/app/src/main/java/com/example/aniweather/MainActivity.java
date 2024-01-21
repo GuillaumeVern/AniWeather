@@ -1,11 +1,17 @@
 package com.example.aniweather;
 
+import android.app.AlertDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -17,7 +23,10 @@ import androidx.viewpager.widget.ViewPager;
 import androidx.viewpager2.adapter.FragmentStateAdapter;
 import androidx.viewpager2.widget.ViewPager2;
 
-import com.example.aniweather.fragments.EmptyFragment;
+import com.example.aniweather.enums.SpeedUnit;
+import com.example.aniweather.enums.TemperatureUnit;
+import com.example.aniweather.fragments.SavedCitiesFragment;
+import com.example.aniweather.fragments.SettingsFragment;
 import com.example.aniweather.fragments.MainMeteoFragment;
 import com.example.aniweather.model.Current;
 import com.example.aniweather.model.Daily;
@@ -68,6 +77,8 @@ public class MainActivity extends AppCompatActivity{
     private TextView wind_speed;
     private TextView sunrise_time;
     private TextView sunset_time;
+    private boolean metric_units;
+
     private City city;
 
     // pager
@@ -75,7 +86,6 @@ public class MainActivity extends AppCompatActivity{
 
     private ViewPager2 viewPager;
 
-    private FragmentStateAdapter pagerAdapter;
     // pager end
 
     @Override
@@ -83,25 +93,25 @@ public class MainActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.view_pager);
 
-        roomdb = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "cities").build();
+        roomdb = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, AniWeatherApplication.getAppContext().getFilesDir() + "/cities").build();
 
         viewPager = findViewById(R.id.viewPager);
-        pagerAdapter = new FragmentStateAdapter(this) {
+        FragmentStateAdapter pagerAdapter = new FragmentStateAdapter(this) {
             @Override
             public Fragment createFragment(int position) {
                 Fragment fragment;
-                switch (position){
+                switch (position) {
                     case 0:
-                        fragment = new EmptyFragment();
+                        fragment = new SavedCitiesFragment();
                         break;
                     case 1:
-                        fragment =  new MainMeteoFragment();
+                        fragment = new MainMeteoFragment();
                         break;
                     case 2:
-                        fragment = new EmptyFragment();
+                        fragment = new SettingsFragment();
                         break;
                     default:
-                        fragment = new EmptyFragment();
+                        fragment = new MainMeteoFragment();
                         break;
                 }
                 return fragment;
@@ -122,12 +132,9 @@ public class MainActivity extends AppCompatActivity{
                 System.out.println("position : " + position);
                 if (position == 1) {
                     instantiateViews();
-                    SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
-                    main_city_name = prefs.getString("city", "Montauban");
-                    System.out.println(prefs.getString("city", "Montauban"));
                     main_city_display.setText(main_city_name);
                     initCurrentData();
-                    citiesButtonHandler();
+                    mainCityNameHandler();
                 }
             }
 
@@ -147,6 +154,7 @@ public class MainActivity extends AppCompatActivity{
 
         viewPager.setCurrentItem(1);
 
+        this.metric_units = getSharedPreferences("prefs", MODE_PRIVATE).getString("metric_units", "metric").equals("metric");
     }
 
     @Override
@@ -173,8 +181,8 @@ public class MainActivity extends AppCompatActivity{
      */
     public void instantiateViews(){
         this.main_city_display = (TextView) findViewById(R.id.main_city_display);
+        this.main_city_display.setText(getSharedPreferences("prefs", MODE_PRIVATE).getString("city", "Toulouse"));
         this.main_city_name = main_city_display.getText().toString();
-        this.cities_button = (Button) findViewById(R.id.cities_button);
         this.main_temperature_number = (TextView) findViewById(R.id.main_temperature_number);
         this.single_word_weather = (TextView) findViewById(R.id.single_word_weather);
         this.main_max_day_temp = (TextView) findViewById(R.id.main_max_day_temp);
@@ -200,15 +208,25 @@ public class MainActivity extends AppCompatActivity{
         this.wind_speed = (TextView) findViewById(R.id.wind_speed);
         this.sunrise_time = (TextView) findViewById(R.id.sunrise_time);
         this.sunset_time = (TextView) findViewById(R.id.sunset_time);
+        this.main_temperature_unit = (TextView) findViewById(R.id.main_temperature_unit);
+
     }
 
-    public void citiesButtonHandler(){
-        this.cities_button.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                main_city_name = main_city_display.getText().toString();
-                initCurrentData();
-
+    public void mainCityNameHandler(){
+        this.main_city_display.setOnEditorActionListener(new EditText.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                    main_city_name = main_city_display.getText().toString();
+                    InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+                    imm.hideSoftInputFromWindow(viewPager.getWindowToken(), 0);
+                    initCurrentData();
+                    return true;
+                }
+                return false;
             }
+
+
         });
     }
 
@@ -245,6 +263,8 @@ public class MainActivity extends AppCompatActivity{
 
                 String temperature_2m = String.valueOf(current.getTemperature_2m());
                 main_temperature_number.setText(temperature_2m);
+
+                main_temperature_unit.setText(this.metric_units ? TemperatureUnit.CELSIUS.libelle : TemperatureUnit.FAHRENHEIT.libelle);
 
                 String weatherVariable = current.getWeatherVariable().libelle;
                 single_word_weather.setText(weatherVariable);
@@ -364,9 +384,8 @@ public class MainActivity extends AppCompatActivity{
         String real_feel = String.valueOf(this.weatherDataRepository.getCurrent().getApparent_temperature());
         real_feel_value.setText(real_feel + "°");
 
-        // String uv = String.valueOf(weatherDataRepository.getCurrent().getUv_index_clear_sky());
-        // uv_value.setText(uv);
-        // cette donnée n'est pas présente dans l'api openmeteo, oopsie doopsie ¯\_(ツ)_/¯
+         uv_value.setText("¯\\_(ツ)_/¯");
+        // cette donnée n'est pas présente dans l'api openmeteo, oopsie doopsie
 
         String pressure = String.valueOf(this.weatherDataRepository.getCurrent().getPressure_msl());
         pressure_value.setText(pressure + " hPa");
@@ -396,7 +415,7 @@ public class MainActivity extends AppCompatActivity{
         wind_direction_libelle.setText(wind_direction_string);
 
         String wind_speed_value = String.valueOf(this.weatherDataRepository.getCurrent().getWind_speed_10m());
-        wind_speed.setText(wind_speed_value + " km/h");
+        wind_speed.setText(wind_speed_value + (this.metric_units ? SpeedUnit.KPH.libelle : SpeedUnit.MPH.libelle));
     }
 
     public void initSunInfo(){
@@ -413,10 +432,15 @@ public class MainActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        if (viewPager.getCurrentItem() == 0) {
-            super.onBackPressed();
+        if (viewPager.getCurrentItem() == 1) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Exit")
+                    .setMessage("Voulez-vous vraiment quitter ?")
+                    .setPositiveButton("Oui", (dialog, which) -> super.onBackPressed())
+                    .setNegativeButton("Non", null)
+                    .show();
         } else {
-            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+            viewPager.setCurrentItem(1);
         }
     }
 

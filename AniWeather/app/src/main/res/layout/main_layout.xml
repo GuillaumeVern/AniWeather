@@ -17,14 +17,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <Button
-            android:id="@+id/cities_button"
-            style="@style/Widget.AppCompat.Button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="4"
-            android:text="Select city" />
-
         <EditText
             android:id="@+id/main_city_display"
             android:layout_width="0dp"
@@ -34,12 +26,6 @@
             android:inputType="text"
             android:textAlignment="center" />
 
-        <Button
-            android:id="@+id/settings_button"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="4"
-            android:text="Settings" />
     </LinearLayout>
 
     <ScrollView
@@ -64,7 +50,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="°c"
                 android:textAlignment="viewStart"
                 android:textSize="34sp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -606,7 +591,6 @@
                         android:id="@+id/textView23"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="TextView"
                         app:layout_constraintBottom_toBottomOf="@+id/textView24"
                         app:layout_constraintEnd_toStartOf="@+id/textView24"
                         app:layout_constraintHorizontal_bias="0.5"
@@ -618,7 +602,6 @@
                         android:id="@+id/textView24"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:text="TextView"
                         android:textAlignment="textEnd"
                         app:layout_constraintBottom_toBottomOf="@+id/textView23"
                         app:layout_constraintEnd_toEndOf="parent"
