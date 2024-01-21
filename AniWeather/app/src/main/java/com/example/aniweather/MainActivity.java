@@ -3,20 +3,25 @@ package com.example.aniweather;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 import androidx.room.Room;
 import androidx.viewpager.widget.ViewPager;
@@ -35,6 +40,7 @@ import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.formatter.ColorFormatter;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
 
@@ -56,6 +62,8 @@ public class MainActivity extends AppCompatActivity{
     private TextView single_word_weather;
     private TextView main_max_day_temp;
     private TextView main_min_day_temp;
+    private ImageView icon_5_days;
+    private ImageView icon_24_hours;
     private TextView day_1_max;
     private TextView day_1_min;
     private ImageView day_1_logo;
@@ -78,6 +86,9 @@ public class MainActivity extends AppCompatActivity{
     private TextView sunrise_time;
     private TextView sunset_time;
     private boolean metric_units;
+    private ScrollView scrollView;
+    private ImageView background_image;
+    private ConstraintLayout secondary_constraint_layout;
 
     private City city;
 
@@ -180,6 +191,7 @@ public class MainActivity extends AppCompatActivity{
      * fonction d'initialisation des variables permettant de modifier les vues
      */
     public void instantiateViews(){
+        this.secondary_constraint_layout = (ConstraintLayout) findViewById(R.id.secondary_constraint_layout);
         this.main_city_display = (TextView) findViewById(R.id.main_city_display);
         this.main_city_display.setText(getSharedPreferences("prefs", MODE_PRIVATE).getString("city", "Toulouse"));
         this.main_city_name = main_city_display.getText().toString();
@@ -209,6 +221,10 @@ public class MainActivity extends AppCompatActivity{
         this.sunrise_time = (TextView) findViewById(R.id.sunrise_time);
         this.sunset_time = (TextView) findViewById(R.id.sunset_time);
         this.main_temperature_unit = (TextView) findViewById(R.id.main_temperature_unit);
+        this.icon_5_days = (ImageView) findViewById(R.id.icon_5_days);
+        this.icon_24_hours = (ImageView) findViewById(R.id.icon_24_hours);
+        this.scrollView = (ScrollView) findViewById(R.id.scrollView);
+        this.background_image = (ImageView) findViewById(R.id.background_image);
 
     }
 
@@ -261,9 +277,19 @@ public class MainActivity extends AppCompatActivity{
                 Current current = this.weatherDataRepository.getCurrent();
                 Daily today = this.weatherDataRepository.getToday();
 
+                if(!this.metric_units){
+                    current.setTemperature_2m(current.getTemperature_2m() * 1.8 + 32);
+                    for(int i = 0; i < this.weatherDataRepository.getHourly().size(); i++){
+                        this.weatherDataRepository.getHourly().get(i).setTemperature_2m(this.weatherDataRepository.getHourly().get(i).getTemperature_2m() * 1.8 + 32);
+                    }
+                    for(int i = 0; i < this.weatherDataRepository.getDaily().size(); i++){
+                        this.weatherDataRepository.getDaily().get(i).setTemperature_2m_max(this.weatherDataRepository.getDaily().get(i).getTemperature_2m_max() * 1.8 + 32);
+                        this.weatherDataRepository.getDaily().get(i).setTemperature_2m_min(this.weatherDataRepository.getDaily().get(i).getTemperature_2m_min() * 1.8 + 32);
+                    }
+
+                }
                 String temperature_2m = String.valueOf(current.getTemperature_2m());
                 main_temperature_number.setText(temperature_2m);
-
                 main_temperature_unit.setText(this.metric_units ? TemperatureUnit.CELSIUS.libelle : TemperatureUnit.FAHRENHEIT.libelle);
 
                 String weatherVariable = current.getWeatherVariable().libelle;
@@ -289,6 +315,17 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void initWeekForecastData(){
+        if(getSharedPreferences("prefs", MODE_PRIVATE).getBoolean("i_like_doughnuts", false)){
+            background_image.setImageResource(R.drawable.doughnut);
+            secondary_constraint_layout.setBackground(ResourcesCompat.getDrawable(getResources(), R.drawable.doughnut, null));
+        } else {
+            background_image.setImageResource(getResources().getIdentifier(this.weatherDataRepository.getDaily().get(0).getWeatherVariable().path, "drawable", getPackageName()));
+        }
+
+
+        String icon_5_days_path = this.weatherDataRepository.getDaily().get(0).getWeatherVariable().path;
+        icon_5_days.setImageResource(getResources().getIdentifier(icon_5_days_path, "drawable", getPackageName()));
+
         String day_1_max_temp = String.valueOf(this.weatherDataRepository.getDaily().get(0).getTemperature_2m_max());
         day_1_max.setText(day_1_max_temp + "°");
 
@@ -297,6 +334,9 @@ public class MainActivity extends AppCompatActivity{
 
         String day_1_weatherVariable = this.weatherDataRepository.getDaily().get(0).getWeatherVariable().libelle;
         day_1_single_word_weather.setText(day_1_weatherVariable);
+
+        String day_1_icon_path = this.weatherDataRepository.getDaily().get(0).getWeatherVariable().path;
+        day_1_logo.setImageResource(getResources().getIdentifier(day_1_icon_path, "drawable", getPackageName()));
 
 
         String day_2_max_temp = String.valueOf(this.weatherDataRepository.getDaily().get(1).getTemperature_2m_max());
@@ -308,6 +348,9 @@ public class MainActivity extends AppCompatActivity{
         String day_2_weatherVariable = this.weatherDataRepository.getDaily().get(1).getWeatherVariable().libelle;
         day_2_single_word_weather.setText(day_2_weatherVariable);
 
+        String day_2_icon_path = this.weatherDataRepository.getDaily().get(1).getWeatherVariable().path;
+        day_2_logo.setImageResource(getResources().getIdentifier(day_2_icon_path, "drawable", getPackageName()));
+
 
         String day_3_max_temp = String.valueOf(this.weatherDataRepository.getDaily().get(2).getTemperature_2m_max());
         day_3_max.setText(day_3_max_temp + "°");
@@ -318,10 +361,18 @@ public class MainActivity extends AppCompatActivity{
         String day_3_weatherVariable = this.weatherDataRepository.getDaily().get(2).getWeatherVariable().libelle;
         day_3_single_word_weather.setText(day_3_weatherVariable);
 
+        String day_3_icon_path = this.weatherDataRepository.getDaily().get(2).getWeatherVariable().path;
+        day_3_logo.setImageResource(getResources().getIdentifier(day_3_icon_path, "drawable", getPackageName()));
+
+
 
     }
 
     public void buildChart(){
+        String icon_24_hours_path = this.weatherDataRepository.getHourly().get(0).getWeatherVariable().path;
+        icon_24_hours.setImageResource(getResources().getIdentifier(icon_24_hours_path, "drawable", getPackageName()));
+
+
         List<Entry> entries = new ArrayList<>();
         LocalDateTime now = LocalDateTime.now();
         int currentHour = now.getHour();
@@ -341,6 +392,7 @@ public class MainActivity extends AppCompatActivity{
         dataSet.setDrawFilled(true);
         dataSet.setValueTextSize(12f);
         dataSet.setDrawCircles(false);
+        dataSet.setColor(Color.parseColor("#1aed3a"));
 
         dataSet.setValueFormatter(new ValueFormatter() {
             @Override

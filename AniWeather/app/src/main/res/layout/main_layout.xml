@@ -6,6 +6,15 @@
     android:layout_height="match_parent"
     android:background="#B2D6F4">
 
+    <ImageView
+        android:id="@+id/background_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleType="fitCenter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
@@ -38,9 +47,11 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+>
 
         <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/secondary_constraint_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="96dp">
@@ -121,6 +132,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="96dp"
+                app:cardBackgroundColor="#65FFFFFF"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:contentPadding="10dp"
@@ -133,7 +145,7 @@
 
                     <ImageView
                         android:id="@+id/icon_5_days"
-                        android:layout_width="wrap_content"
+                        android:layout_width="35dp"
                         android:layout_height="24dp"
                         app:layout_constraintBottom_toTopOf="@+id/day_1_logo"
                         app:layout_constraintEnd_toStartOf="@+id/label_5_days"
@@ -141,11 +153,11 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toTopOf="parent"
                         app:layout_constraintVertical_bias="0.5"
-                        app:srcCompat="@mipmap/cloud" />
+                        app:srcCompat="@drawable/cloud_basic_f" />
 
                     <TextView
                         android:id="@+id/label_5_days"
-                        android:layout_width="wrap_content"
+                        android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:text="5-day forecast"
                         app:layout_constraintBottom_toTopOf="@+id/day_1_name"
@@ -154,7 +166,7 @@
 
                     <ImageView
                         android:id="@+id/day_1_logo"
-                        android:layout_width="wrap_content"
+                        android:layout_width="35dp"
                         android:layout_height="24dp"
                         app:layout_constraintBottom_toTopOf="@+id/day_2_logo"
                         app:layout_constraintEnd_toStartOf="@+id/day_1_name"
@@ -166,7 +178,7 @@
 
                     <TextView
                         android:id="@+id/day_1_name"
-                        android:layout_width="wrap_content"
+                        android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:text="Today"
                         app:layout_constraintBottom_toBottomOf="@+id/day_1_logo"
@@ -221,7 +233,7 @@
 
                     <ImageView
                         android:id="@+id/day_2_logo"
-                        android:layout_width="wrap_content"
+                        android:layout_width="35dp"
                         android:layout_height="24dp"
                         app:layout_constraintBottom_toTopOf="@+id/day_3_logo"
                         app:layout_constraintEnd_toStartOf="@+id/day_2_name"
@@ -233,7 +245,7 @@
 
                     <TextView
                         android:id="@+id/day_2_name"
-                        android:layout_width="wrap_content"
+                        android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:layout_marginBottom="8dp"
@@ -292,7 +304,7 @@
 
                     <ImageView
                         android:id="@+id/day_3_logo"
-                        android:layout_width="wrap_content"
+                        android:layout_width="35dp"
                         android:layout_height="24dp"
                         app:layout_constraintBottom_toBottomOf="parent"
                         app:layout_constraintEnd_toStartOf="@+id/day_3_name"
@@ -304,7 +316,7 @@
 
                     <TextView
                         android:id="@+id/day_3_name"
-                        android:layout_width="wrap_content"
+                        android:layout_width="100dp"
                         android:layout_height="wrap_content"
                         android:text="Other"
                         app:layout_constraintBottom_toBottomOf="@+id/day_3_logo"
@@ -368,6 +380,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
                 android:layout_marginTop="8dp"
+                app:cardBackgroundColor="#66FFFFFF"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:contentPadding="10dp"
@@ -380,7 +393,7 @@
 
                     <ImageView
                         android:id="@+id/icon_24_hours"
-                        android:layout_width="wrap_content"
+                        android:layout_width="35dp"
                         android:layout_height="0dp"
                         app:layout_constraintBottom_toBottomOf="@+id/label_24_hours"
                         app:layout_constraintEnd_toStartOf="@+id/label_24_hours"
@@ -411,6 +424,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                app:cardBackgroundColor="#66FFFFFF"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:contentPadding="8dp"
@@ -447,6 +461,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
+                app:cardBackgroundColor="#66FFFFFF"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:contentPadding="8dp"
@@ -482,6 +497,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="8dp"
+                app:cardBackgroundColor="#66FFFFFF"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="0dp"
                 app:contentPadding="8dp"

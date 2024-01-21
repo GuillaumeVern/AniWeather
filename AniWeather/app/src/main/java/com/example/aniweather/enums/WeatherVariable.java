@@ -1,44 +1,46 @@
 package com.example.aniweather.enums;
 
 public enum WeatherVariable {
-    CLEAR_SKY("Clear sky", 0),
-    MAINLY_CLEAR_("Mainly clear", 1),
-    PARTLY_CLOUDY("Partly cloudy", 2),
-    OVERCAST("Overcast", 3),
-    FOG("Fog", 45),
-    DEPOSITING_RIME_FOG("Depositing rime fog", 48),
-    DRIZZLE_LIGHT("Light drizzle", 51),
-    DRIZZLE_MODERATE("Moderate drizzle", 53),
-    DRIZZLE_HEAVY("Heavy drizzle", 55),
-    DRIZZLE_FREEZING_LIGHT("Light freezing drizzle", 56),
-    DRIZZLE_FREEZING_HEAVY("Heavy freezing drizzle", 57),
-    RAIN_LIGHT("Slight rain", 61),
-    RAIN_MODERATE("Moderate rain", 63),
-    RAIN_HEAVY("Heavy rain", 65),
-    RAIN_FREEZING_LIGHT("Light freezing rain", 66),
-    RAIN_FREEZING_HEAVY("Heavy freezing rain", 67),
-    SNOW_LIGHT("Light snow fall", 71),
-    SNOW_MODERATE("Moderate snow fall", 73),
-    SNOW_HEAVY("Heavy snow fall", 75),
-    SNOW_GRAINS("Snow grains", 77),
-    RAIN_SHOWER_LIGHT("Light rain showers", 80),
-    RAIN_SHOWER_MODERATE("Moderate rain showers", 81),
-    RAIN_SHOWER_HEAVY("Violent rain showers", 82),
-    SNOW_SHOWER_LIGHT("Light snow showers", 85),
-    SNOW_SHOWER_HEAVY("Heavy snow showers", 86),
-    THUNDERSTORM("Thunderstorm", 95),
-    THUNDERSTORM_HAIL_LIGHT("Thunderstorm with light hail", 96),
-    THUNDERSTORM_HAIL_HEAVY("Thunderstorm with heavy hail", 99);
+    CLEAR_SKY("Clear sky", 0, "sun_f"),
+    MAINLY_CLEAR_("Mainly clear", 1, "cloud_sun_f"),
+    PARTLY_CLOUDY("Partly cloudy", 2, "cloud_sun_f"),
+    OVERCAST("Overcast", 3, "cloud_basic_f"),
+    FOG("Fog", 45, "cloud_fog_f"),
+    DEPOSITING_RIME_FOG("Depositing rime fog", 48, "cloud_fog_f"),
+    DRIZZLE_LIGHT("Light drizzle", 51, "cloud_rain_f"),
+    DRIZZLE_MODERATE("Moderate drizzle", 53, "cloud_rain_f"),
+    DRIZZLE_HEAVY("Heavy drizzle", 55, "cloud_rain_f"),
+    DRIZZLE_FREEZING_LIGHT("Light freezing drizzle", 56, "cloud_rain_f"),
+    DRIZZLE_FREEZING_HEAVY("Heavy freezing drizzle", 57, "cloud_rain_f"),
+    RAIN_LIGHT("Slight rain", 61, "cloud_rain_f"),
+    RAIN_MODERATE("Moderate rain", 63, "cloud_rain_f"),
+    RAIN_HEAVY("Heavy rain", 65, "cloud_rain_f"),
+    RAIN_FREEZING_LIGHT("Light freezing rain", 66, "cloud_rain_f"),
+    RAIN_FREEZING_HEAVY("Heavy freezing rain", 67, "cloud_rain_f"),
+    SNOW_LIGHT("Light snow fall", 71, "cloud_snow_f"),
+    SNOW_MODERATE("Moderate snow fall", 73, "cloud_snow_f"),
+    SNOW_HEAVY("Heavy snow fall", 75, "cloud_snow_f"),
+    SNOW_GRAINS("Snow grains", 77, "snow_f"),
+    RAIN_SHOWER_LIGHT("Light rain showers", 80, "cloud_rain_f"),
+    RAIN_SHOWER_MODERATE("Moderate rain showers", 81, "cloud_rain_f"),
+    RAIN_SHOWER_HEAVY("Violent rain showers", 82, "cloud_rain_f"),
+    SNOW_SHOWER_LIGHT("Light snow showers", 85, "cloud_snow_f"),
+    SNOW_SHOWER_HEAVY("Heavy snow showers", 86, "cloud_snow_f"),
+    THUNDERSTORM("Thunderstorm", 95, "cloud_lightning_f"),
+    THUNDERSTORM_HAIL_LIGHT("Thunderstorm with light hail", 96, "cloud_lightning_f"),
+    THUNDERSTORM_HAIL_HEAVY("Thunderstorm with heavy hail", 99, "cloud_lightning_f");
 
     public final String libelle;
     public final int code;
+    public final String path;
 
     // public final String path;
     // path des images seront sotckés dans l'enum
 
-    private WeatherVariable(String libelle, int code){
+    private WeatherVariable(String libelle, int code, String path){
         this.libelle = libelle;
         this.code = code;
+        this.path = path;
     }
 
     public static WeatherVariable getWeatherVariableFromCode(int code){

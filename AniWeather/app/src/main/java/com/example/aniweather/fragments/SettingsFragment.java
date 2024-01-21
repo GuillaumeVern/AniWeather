@@ -20,6 +20,7 @@ import com.example.aniweather.R;
 public class SettingsFragment extends Fragment {
 
     private Switch metric_units_switch;
+    private Switch i_like_doughnut_switch;
     private Button apply_settings;
 
     @Override
@@ -42,6 +43,24 @@ public class SettingsFragment extends Fragment {
             }
             editor.apply();
         });
+
+        this.i_like_doughnut_switch = rootView.findViewById(R.id.i_like_doughnuts_switch);
+        if (prefs.getBoolean("i_like_doughnuts", false)) {
+            this.i_like_doughnut_switch.setChecked(true);
+        } else {
+            this.i_like_doughnut_switch.setChecked(false);
+        }
+        this.i_like_doughnut_switch.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            SharedPreferences.Editor editor = prefs.edit();
+            if (isChecked) {
+                editor.putBoolean("i_like_doughnuts", true);
+            } else {
+                editor.putBoolean("i_like_doughnuts", false);
+            }
+            editor.apply();
+        });
+
+        // utilisation d'une intent parce que c'est plus simple et parce que j'en ai pas utilisé dans toute l'appli
         this.apply_settings.setOnClickListener(v -> {
             Intent i = new Intent(AniWeatherApplication.getAppContext(), MainActivity.class);
             i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP| Intent.FLAG_ACTIVITY_NEW_TASK);
