@@ -1,7 +1,14 @@
 package com.example.aniweather;
 
+
+import android.content.Context;
+import android.os.Build;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.MediaStore;
+
+import androidx.annotation.RequiresApi;
 
 import com.example.aniweather.enums.Timezone;
 import com.example.aniweather.model.Current;
@@ -12,25 +19,27 @@ import com.example.aniweather.model.Units;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.*;
 import java.text.MessageFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.Iterator;
 
-/**
- * classe singleton servant a gérer la mise en cache des données de l'api
- */
 public class WeatherDataRepository {
-
-    private static WeatherDataRepository WeatherDataRepositoryInstance;
 
 
     private City city;
 
-    private String allTheData;
+    private JSONObject allTheData;
 
     private double latitude;
     private double longitude;
@@ -42,17 +51,17 @@ public class WeatherDataRepository {
     private Current current;
     private ArrayList<Hourly> hourly;
     private ArrayList<Daily> daily;
-    private boolean dataReceived = false;
+    private LocalDateTime lastUpdate;
+    private boolean dataReceived;
 
 
-    private WeatherDataRepository(){};
+    public WeatherDataRepository(City city){
+        this.dataReceived = false;
+        this.city = city;
+        this.allTheData = new JSONObject();
+        this.setAllTheData();
+    };
 
-    public static synchronized WeatherDataRepository getInstance(){
-        if(WeatherDataRepositoryInstance == null){
-            WeatherDataRepositoryInstance = new WeatherDataRepository();
-        }
-        return WeatherDataRepositoryInstance;
-    }
 
     public City getCity() {
         return city;
@@ -66,91 +75,152 @@ public class WeatherDataRepository {
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
+            executor.execute(() -> {
 
-        executor.execute(() -> {
-            while(!city.isResponseReceived()){
-                //thread séparé donc OK de le bloquer
-            }
+                if(!readCityFromFile(city)) {
 
-            try{
-                URL url = new URL(MessageFormat.format("https://api.open-meteo.com/v1/forecast?latitude={0}&longitude={1}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,precipitation_probability,rain,weather_code,surface_pressure,cloud_cover,wind_speed_10m,temperature_80m,uv_index,is_day,sunshine_duration&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max,precipitation_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,shortwave_radiation_sum&timezone=Europe%2FBerlin", city.getLatitude(), city.getLongitude()));
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setRequestMethod("GET");
-                con.setConnectTimeout(5000);
-                System.out.println(con.getURL());
-                int responseCode = con.getResponseCode();
-                System.out.println("all the data GET Response Code :: " + responseCode);
-                if (responseCode == HttpURLConnection.HTTP_OK) { // success
-                    BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
-                    String inputLine;
-                    StringBuilder response = new StringBuilder();
+                    try {
+                        URL url = new URL(MessageFormat.format("https://api.open-meteo.com/v1/forecast?latitude={0}&longitude={1}&current=temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,rain,showers,snowfall,weather_code,cloud_cover,pressure_msl,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&hourly=temperature_2m,relative_humidity_2m,dew_point_2m,apparent_temperature,precipitation_probability,rain,weather_code,surface_pressure,cloud_cover,wind_speed_10m,temperature_80m,uv_index,is_day,sunshine_duration&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,daylight_duration,sunshine_duration,uv_index_max,precipitation_sum,precipitation_hours,precipitation_probability_max,wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,shortwave_radiation_sum&timezone=Europe%2FBerlin", city.getLatitude(), city.getLongitude()));
+                        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                        con.setRequestMethod("GET");
+                        con.setConnectTimeout(5000);
+                        System.out.println(con.getURL());
+                        int responseCode = con.getResponseCode();
+                        System.out.println("all the data GET Response Code :: " + responseCode);
+                        if (responseCode == HttpURLConnection.HTTP_OK) { // success
+                            BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+                            String inputLine;
+                            StringBuilder response = new StringBuilder();
 
-                    while ((inputLine = in.readLine()) != null) {
-                        response.append(inputLine);
+                            while ((inputLine = in.readLine()) != null) {
+                                response.append(inputLine);
+                            }
+                            in.close();
+                            JSONObject allTheData = new JSONObject(response.toString());
+                            allTheData.put("city_latitude", city.getLatitude());
+                            allTheData.put("city_longitude", city.getLongitude());
+                            this.allTheData = allTheData;
+                            writeToSavedCities();
+                            parseToWeatherApiData();
+                        } else {
+                            System.out.println("all the data GET request did not work.");
+                        }
+                    } catch (Exception e) {
+                        System.out.println(MessageFormat.format("all the data error: {0} ; {1}", e, e.getMessage()));
                     }
-                    in.close();
-                    this.allTheData = response.toString();
-                } else {
-                    System.out.println("all the data GET request did not work.");
                 }
-            } catch(Exception e){
-                System.out.println(MessageFormat.format("all the data error: {0} ; {1}", e, e.getMessage()));
-            }
 
-            parseToWeatherApiData();
-
-            handler.post(() -> {
+                handler.post(() -> {
+                });
             });
-        });
     }
 
-    public String getAllTheData() {
+    public boolean readCityFromFile(City city){
+        Context context = AniWeatherApplication.getAppContext();
+        File inputFile = new File(context.getFilesDir(), "savedCities.txt");
+        File tempFile = new File(context.getFilesDir(), "tempSavedCities.txt");
+        boolean result = false;
+
+        try (BufferedReader br = new BufferedReader(new InputStreamReader(context.openFileInput("savedCities.txt")));
+             BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
+
+            String line;
+            while ((line = br.readLine()) != null) {
+                JSONObject jsonObject = new JSONObject(line);
+                LocalDateTime lastUpdate = LocalDateTime.parse(jsonObject.getString("lastUpdate"));
+                if (lastUpdate.plusHours(1).isAfter(LocalDateTime.now())) {
+                    if (jsonObject.getString("city_latitude").equals(city.getLatitude()) && jsonObject.getString("city_longitude").equals(city.getLongitude())) {
+                        System.out.println("found city in file");
+                        this.allTheData = jsonObject;
+                        this.parseToWeatherApiData();
+                        this.setDataReceived(true);
+                        result = true;
+                    }
+                    bw.write(line);
+                    bw.newLine();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("erreur lors de la lecture de savedCities : " + e.getMessage());
+            // remove all data from savedCities.txt
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(tempFile))) {
+                bw.write("");
+            } catch (Exception ex) {
+                System.out.println("erreur lors de la suppression de savedCities : " + ex.getMessage());
+            }
+        }
+
+        if (!inputFile.delete() || !tempFile.renameTo(inputFile)) {
+            System.out.println("Erreur lors de la suppression ou du remplacement du fichier.");
+        }
+
+        return result;
+    }
+
+    public JSONObject getAllTheData() {
         return allTheData;
     }
 
 
+    public void writeToSavedCities(){
+        File file = new File(AniWeatherApplication.getAppContext().getFilesDir(), "savedCities.txt");
+
+        try(BufferedWriter bw = new BufferedWriter(new FileWriter(file, true))){
+
+            this.lastUpdate = LocalDateTime.now();
+            this.allTheData.put("lastUpdate", this.lastUpdate.toString());
+
+
+
+            bw.write(this.allTheData.toString() + "\n");
+            System.out.println("file written to : " + file.getAbsolutePath());
+
+        } catch(Exception e) {
+            System.out.println("erreur lors de l'écriture dans savedCities : " + e.getMessage());
+        }
+    }
+
     public void parseToWeatherApiData(){
         try{
-            JSONObject allTheDataJsonObject = new JSONObject(allTheData);
-            Iterator<String> keys = allTheDataJsonObject.keys();
+            Iterator<String> keys = allTheData.keys();
 
             while(keys.hasNext()){
                 String key = keys.next();
-                System.out.println(key + " : " + allTheDataJsonObject.getString(key));
-                if(allTheDataJsonObject.get(key) instanceof JSONObject){
+                System.out.println(key + " : " + allTheData.getString(key));
+                if(allTheData.get(key) instanceof Object){
                     switch(key){
                         case "latitude":
-                            this.setLatitude(allTheDataJsonObject.getDouble(key));
+                            this.setLatitude(allTheData.getDouble(key));
                             break;
                         case "longitude":
-                            this.setLongitude(allTheDataJsonObject.getDouble(key));
+                            this.setLongitude(allTheData.getDouble(key));
                             break;
                         case "utc_offset_seconds":
-                            this.setUtc_offset_seconds(allTheDataJsonObject.getInt(key));
+                            this.setUtc_offset_seconds(allTheData.getInt(key));
                             break;
                         case "timezone":
-                            this.setTimezone(allTheDataJsonObject.getString(key));
+                            this.setTimezone(allTheData.getString(key));
                             break;
                         case "timezone_abbreviation":
                             // l'abbreviation est directement définie dans l'enum
                             break;
                         case "elevation":
-                            this.setElevation(allTheDataJsonObject.getDouble(key));
+                            this.setElevation(allTheData.getDouble(key));
                             break;
                         case "current_units":
                             break;
                         case "current":
-                            this.setCurrent(allTheDataJsonObject.getJSONObject(key));
+                            this.setCurrent(allTheData.getJSONObject(key));
                             break;
                         case "hourly_units":
                             break;
                         case "hourly":
-                            this.setHourly(allTheDataJsonObject.getJSONObject(key));
+                            this.setHourly(allTheData.getJSONObject(key));
                             break;
                         case "daily_units":
                             break;
                         case "daily":
-                            this.setDaily(allTheDataJsonObject.getJSONObject(key));
+                            this.setDaily(allTheData.getJSONObject(key));
                             break;
                         default:
                             break;
@@ -256,7 +326,7 @@ public class WeatherDataRepository {
     }
 
     public void setDaily(JSONObject dailyJSONObject) {
-        this.daily = new ArrayList<Daily>();
+        this.daily = new ArrayList();
         try{
             for(int i = 0; i < dailyJSONObject.getJSONArray("time").length(); i++) {
                 Daily daily = new Daily(dailyJSONObject, i);

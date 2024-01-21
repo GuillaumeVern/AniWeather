@@ -1,14 +1,9 @@
 package com.example.aniweather;
 
-import static com.github.mikephil.charting.animation.Easing.EaseInCubic;
-import static com.github.mikephil.charting.animation.Easing.EaseInOutCubic;
-import static com.github.mikephil.charting.animation.Easing.EaseOutCubic;
-
-import android.graphics.Color;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.StrictMode;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -16,20 +11,23 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.room.Room;
+import androidx.viewpager.widget.ViewPager;
+import androidx.viewpager2.adapter.FragmentStateAdapter;
+import androidx.viewpager2.widget.ViewPager2;
 
+import com.example.aniweather.fragments.EmptyFragment;
+import com.example.aniweather.fragments.MainMeteoFragment;
 import com.example.aniweather.model.Current;
 import com.example.aniweather.model.Daily;
-import com.github.mikephil.charting.charts.BubbleChart;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.data.BubbleData;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.github.mikephil.charting.formatter.ValueFormatter;
-
-import org.w3c.dom.Text;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,6 +36,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class MainActivity extends AppCompatActivity{
+
+    private AppDatabase roomdb;
     private Button cities_button;
     private TextView main_city_display;
     private String main_city_name;
@@ -68,18 +68,110 @@ public class MainActivity extends AppCompatActivity{
     private TextView wind_speed;
     private TextView sunrise_time;
     private TextView sunset_time;
-
-
-
-
     private City city;
+
+    // pager
+    private static final int NUM_PAGES = 3;
+
+    private ViewPager2 viewPager;
+
+    private FragmentStateAdapter pagerAdapter;
+    // pager end
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.view_pager);
 
-        setContentView(R.layout.main_layout);
+        roomdb = Room.databaseBuilder(getApplicationContext(), AppDatabase.class, "cities").build();
 
+        viewPager = findViewById(R.id.viewPager);
+        pagerAdapter = new FragmentStateAdapter(this) {
+            @Override
+            public Fragment createFragment(int position) {
+                Fragment fragment;
+                switch (position){
+                    case 0:
+                        fragment = new EmptyFragment();
+                        break;
+                    case 1:
+                        fragment =  new MainMeteoFragment();
+                        break;
+                    case 2:
+                        fragment = new EmptyFragment();
+                        break;
+                    default:
+                        fragment = new EmptyFragment();
+                        break;
+                }
+                return fragment;
+            }
+
+            @Override
+            public int getItemCount() {
+                return NUM_PAGES;
+            }
+        };
+        viewPager.setAdapter(pagerAdapter);
+
+
+
+        ViewPager.OnPageChangeListener pageChangeListener = new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageSelected(int position) {
+                System.out.println("position : " + position);
+                if (position == 1) {
+                    instantiateViews();
+                    SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+                    main_city_name = prefs.getString("city", "Montauban");
+                    System.out.println(prefs.getString("city", "Montauban"));
+                    main_city_display.setText(main_city_name);
+                    initCurrentData();
+                    citiesButtonHandler();
+                }
+            }
+
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        };
+
+        viewPager.post(() -> pageChangeListener .onPageSelected(viewPager.getCurrentItem()));
+
+        viewPager.setCurrentItem(1);
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        SharedPreferences prefs = getSharedPreferences("prefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putString("city", main_city_display.getText().toString());
+        editor.apply();
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    /**
+     * fonction d'initialisation des variables permettant de modifier les vues
+     */
+    public void instantiateViews(){
         this.main_city_display = (TextView) findViewById(R.id.main_city_display);
         this.main_city_name = main_city_display.getText().toString();
         this.cities_button = (Button) findViewById(R.id.cities_button);
@@ -108,28 +200,6 @@ public class MainActivity extends AppCompatActivity{
         this.wind_speed = (TextView) findViewById(R.id.wind_speed);
         this.sunrise_time = (TextView) findViewById(R.id.sunrise_time);
         this.sunset_time = (TextView) findViewById(R.id.sunset_time);
-
-
-
-
-
-        weatherDataRepository = WeatherDataRepository.getInstance();
-
-        main_city_name = main_city_display.getText().toString();
-        initCurrentData();
-        citiesButtonHandler();
-
-
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onSaveInstanceState(savedInstanceState);
-    }
-
-    @Override
-    public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
     }
 
     public void citiesButtonHandler(){
@@ -142,14 +212,25 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
+    /**
+     * fonction d'initialisation des données de l'api dans les vues
+     */
     public void initCurrentData(){
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
 
         executor.execute(() -> {
-            City city = new City(main_city_name);
-            weatherDataRepository.setCity(city);
-            weatherDataRepository.setAllTheData();
+            City city;
+            city = roomdb.cityDao().getCityByName(main_city_name);
+            if(city == null || city.getName() == null){
+                city = new City(main_city_name);
+                while (!city.isResponseReceived()) {
+                    //thread séparé donc OK de le bloquer
+                }
+                roomdb.cityDao().insert(city);
+            }
+
+            this.weatherDataRepository = new WeatherDataRepository(city);
 
             while(!weatherDataRepository.isDataReceived()){
                 // attendre pour la réponse de l'api
@@ -157,10 +238,10 @@ public class MainActivity extends AppCompatActivity{
 
             handler.post(() -> {
                 // toutes les modifications de l'ui doivent être faites dans le thread principal
-                weatherDataRepository.setDataReceived(false);
+                this.weatherDataRepository.setDataReceived(false);
 
-                Current current = weatherDataRepository.getCurrent();
-                Daily today = weatherDataRepository.getToday();
+                Current current = this.weatherDataRepository.getCurrent();
+                Daily today = this.weatherDataRepository.getToday();
 
                 String temperature_2m = String.valueOf(current.getTemperature_2m());
                 main_temperature_number.setText(temperature_2m);
@@ -188,33 +269,33 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void initWeekForecastData(){
-        String day_1_max_temp = String.valueOf(weatherDataRepository.getDaily().get(0).getTemperature_2m_max());
+        String day_1_max_temp = String.valueOf(this.weatherDataRepository.getDaily().get(0).getTemperature_2m_max());
         day_1_max.setText(day_1_max_temp + "°");
 
-        String day_1_min_temp = String.valueOf(weatherDataRepository.getDaily().get(0).getTemperature_2m_min());
+        String day_1_min_temp = String.valueOf(this.weatherDataRepository.getDaily().get(0).getTemperature_2m_min());
         day_1_min.setText(day_1_min_temp + "°");
 
-        String day_1_weatherVariable = weatherDataRepository.getDaily().get(0).getWeatherVariable().libelle;
+        String day_1_weatherVariable = this.weatherDataRepository.getDaily().get(0).getWeatherVariable().libelle;
         day_1_single_word_weather.setText(day_1_weatherVariable);
 
 
-        String day_2_max_temp = String.valueOf(weatherDataRepository.getDaily().get(1).getTemperature_2m_max());
+        String day_2_max_temp = String.valueOf(this.weatherDataRepository.getDaily().get(1).getTemperature_2m_max());
         day_2_max.setText(day_2_max_temp + "°");
 
-        String day_2_min_temp = String.valueOf(weatherDataRepository.getDaily().get(1).getTemperature_2m_min());
+        String day_2_min_temp = String.valueOf(this.weatherDataRepository.getDaily().get(1).getTemperature_2m_min());
         day_2_min.setText(day_2_min_temp + "°");
 
-        String day_2_weatherVariable = weatherDataRepository.getDaily().get(1).getWeatherVariable().libelle;
+        String day_2_weatherVariable = this.weatherDataRepository.getDaily().get(1).getWeatherVariable().libelle;
         day_2_single_word_weather.setText(day_2_weatherVariable);
 
 
-        String day_3_max_temp = String.valueOf(weatherDataRepository.getDaily().get(2).getTemperature_2m_max());
+        String day_3_max_temp = String.valueOf(this.weatherDataRepository.getDaily().get(2).getTemperature_2m_max());
         day_3_max.setText(day_3_max_temp + "°");
 
-        String day_3_min_temp = String.valueOf(weatherDataRepository.getDaily().get(2).getTemperature_2m_min());
+        String day_3_min_temp = String.valueOf(this.weatherDataRepository.getDaily().get(2).getTemperature_2m_min());
         day_3_min.setText(day_3_min_temp + "°");
 
-        String day_3_weatherVariable = weatherDataRepository.getDaily().get(2).getWeatherVariable().libelle;
+        String day_3_weatherVariable = this.weatherDataRepository.getDaily().get(2).getWeatherVariable().libelle;
         day_3_single_word_weather.setText(day_3_weatherVariable);
 
 
@@ -228,9 +309,9 @@ public class MainActivity extends AppCompatActivity{
         final ArrayList<String> xLabel = new ArrayList<>();
 
         int j = 0;
-        for(int i = currentHour; i < 24 + currentHour; i+=4){
+        for(int i = currentHour; i <= 24 + currentHour; i+=4){
             xLabel.add(String.valueOf(i % 24) + ":00");
-            Entry entry = new Entry(j, (float) weatherDataRepository.getHourly().get(i).getTemperature_2m());
+            Entry entry = new Entry(j, (float) this.weatherDataRepository.getHourly().get(i).getTemperature_2m());
             entries.add(j,entry);
             j++;
         }
@@ -277,22 +358,22 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void initAdditionalInfo(){
-        String humidity = String.valueOf(weatherDataRepository.getCurrent().getRelative_humidity_2m());
+        String humidity = String.valueOf(this.weatherDataRepository.getCurrent().getRelative_humidity_2m());
         humidity_value.setText(humidity + "%");
 
-        String real_feel = String.valueOf(weatherDataRepository.getCurrent().getApparent_temperature());
+        String real_feel = String.valueOf(this.weatherDataRepository.getCurrent().getApparent_temperature());
         real_feel_value.setText(real_feel + "°");
 
         // String uv = String.valueOf(weatherDataRepository.getCurrent().getUv_index_clear_sky());
         // uv_value.setText(uv);
         // cette donnée n'est pas présente dans l'api openmeteo, oopsie doopsie ¯\_(ツ)_/¯
 
-        String pressure = String.valueOf(weatherDataRepository.getCurrent().getPressure_msl());
+        String pressure = String.valueOf(this.weatherDataRepository.getCurrent().getPressure_msl());
         pressure_value.setText(pressure + " hPa");
     }
 
     public void initWindInfo(){
-        int wind_direction = weatherDataRepository.getCurrent().getWind_direction_10m();
+        int wind_direction = this.weatherDataRepository.getCurrent().getWind_direction_10m();
         String wind_direction_string = "";
         if(wind_direction < 15 || wind_direction > 345){
             wind_direction_string = "North";
@@ -314,18 +395,29 @@ public class MainActivity extends AppCompatActivity{
 
         wind_direction_libelle.setText(wind_direction_string);
 
-        String wind_speed_value = String.valueOf(weatherDataRepository.getCurrent().getWind_speed_10m());
+        String wind_speed_value = String.valueOf(this.weatherDataRepository.getCurrent().getWind_speed_10m());
         wind_speed.setText(wind_speed_value + " km/h");
     }
 
     public void initSunInfo(){
-        LocalDateTime sunrise_datetime = weatherDataRepository.getToday().getSunrise();
+        LocalDateTime sunrise_datetime = this.weatherDataRepository.getToday().getSunrise();
         String sunrise = sunrise_datetime.getHour() + ":" + sunrise_datetime.getMinute();
         sunrise_time.setText(sunrise);
 
-        LocalDateTime sunset_datetime = weatherDataRepository.getToday().getSunset();
+        LocalDateTime sunset_datetime = this.weatherDataRepository.getToday().getSunset();
         String sunset = sunset_datetime.getHour() + ":" + sunset_datetime.getMinute();
         sunset_time.setText(sunset);
+    }
+
+
+
+    @Override
+    public void onBackPressed() {
+        if (viewPager.getCurrentItem() == 0) {
+            super.onBackPressed();
+        } else {
+            viewPager.setCurrentItem(viewPager.getCurrentItem() - 1);
+        }
     }
 
 }

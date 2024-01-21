@@ -32,7 +32,6 @@
             android:layout_weight="6"
             android:ems="10"
             android:inputType="text"
-            android:text="Montauban"
             android:textAlignment="center" />
 
         <Button
@@ -513,7 +512,7 @@
 
                     <TextView
                         android:id="@+id/humidity_libelle"
-                        android:layout_width="87dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="Humidity"
                         app:layout_constraintBottom_toTopOf="@+id/real_feel_libelle"
@@ -525,7 +524,7 @@
 
                     <TextView
                         android:id="@+id/humidity_value"
-                        android:layout_width="88dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAlignment="textEnd"
                         app:layout_constraintBottom_toBottomOf="@+id/humidity_libelle"
@@ -536,7 +535,7 @@
 
                     <TextView
                         android:id="@+id/real_feel_libelle"
-                        android:layout_width="87dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="Real feel"
                         app:layout_constraintBottom_toTopOf="@+id/uv_libelle"
@@ -548,7 +547,7 @@
 
                     <TextView
                         android:id="@+id/real_feel_value"
-                        android:layout_width="88dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAlignment="textEnd"
                         app:layout_constraintBottom_toBottomOf="@+id/real_feel_libelle"
@@ -559,7 +558,7 @@
 
                     <TextView
                         android:id="@+id/uv_libelle"
-                        android:layout_width="87dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="UV"
                         app:layout_constraintBottom_toTopOf="@+id/pressure_libelle"
@@ -571,7 +570,7 @@
 
                     <TextView
                         android:id="@+id/uv_value"
-                        android:layout_width="88dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAlignment="textEnd"
                         app:layout_constraintBottom_toBottomOf="@+id/uv_libelle"
@@ -582,7 +581,7 @@
 
                     <TextView
                         android:id="@+id/pressure_libelle"
-                        android:layout_width="87dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="Pressure"
                         app:layout_constraintBottom_toTopOf="@+id/textView23"
@@ -594,7 +593,7 @@
 
                     <TextView
                         android:id="@+id/pressure_value"
-                        android:layout_width="88dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:textAlignment="textEnd"
                         app:layout_constraintBottom_toBottomOf="@+id/pressure_libelle"
@@ -605,7 +604,7 @@
 
                     <TextView
                         android:id="@+id/textView23"
-                        android:layout_width="87dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="TextView"
                         app:layout_constraintBottom_toBottomOf="@+id/textView24"
@@ -617,7 +616,7 @@
 
                     <TextView
                         android:id="@+id/textView24"
-                        android:layout_width="88dp"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:text="TextView"
                         android:textAlignment="textEnd"

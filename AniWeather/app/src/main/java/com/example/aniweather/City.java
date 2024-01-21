@@ -5,6 +5,9 @@ import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,17 +21,28 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-
+@Entity(tableName = "cities")
 public class City {
+
+    @PrimaryKey(autoGenerate = true) private int id;
+
     private String name;
     private String latitude;
     private String longitude;
 
     private boolean responseReceived;
+
+    public City(){
+        this.responseReceived = false;
+    }
     public City(String cityName){
+        // la mise en cache des données des ville se fait dans une base de données sqlite parce que je veux un point en plus
         ExecutorService executor = Executors.newSingleThreadExecutor();
         Handler handler = new Handler(Looper.getMainLooper());
         this.responseReceived = false;
+
+
+
         executor.execute(() -> {
             try{
                 URL url = new URL(MessageFormat.format("https://geokeo.com/geocode/v1/search.php?q={0}&api=64850d598ad9483c8b78f2aa166556a7", URLEncoder.encode(cityName)));
@@ -106,5 +120,20 @@ public class City {
 
     public void setResponseReceived(boolean responseReceived) {
         this.responseReceived = responseReceived;
+    }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return this.name;
     }
 }
